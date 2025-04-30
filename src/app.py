@@ -20,7 +20,8 @@ if datafile:
     
     if target:
         class_values = np.unique(data[target])
-        class_names = st.text_input("Enter class value names, delimited by commas").split(",")
+        class_values_str = "\n".join([str(i) for i in class_values])
+        class_names = st.text_area("Enter desired class value names on each line", value = class_values_str)
         
         if len(class_values) != len(class_names):
             st.write("Incorrect number of class names")
@@ -47,6 +48,23 @@ if datafile:
     categorical_feature_names = st.multiselect("Select Categorical Features. The rest will be discretized", options=keys)
     
     st.session_state["categorical_features"] = []
+    st.session_state["categorical_names"] = {}
+    
+    
+    for i, key in enumerate(keys):
+        for name in categorical_feature_names:
+            if key == name:
+                st.session_state["categorical_features"].append(i)
+    
+    if st.segmented_control("Assign Categorical Feature Class Values:", options=["Automatic", "Manual"], default="Automatic") == "Manual":
+        st.write("For each categorical feature listed below, insert the class values associated with the numerical values. The current numerical values are listed. If no change is needed, keep them as is. Otherwise, replace each number with the respective value names")
+        for idx, name in enumerate(categorical_feature_names):
+            unique = np.unique(data[name])
+            n_unique = len(unique)
+            numerical_list = "\n".join([str(i) for i in unique])
+            res = st.text_area(name, value = numerical_list)
+            st.session_state["categorical_names"][st.session_state["categorical_features"][idx]] = res.split("\n")
+    
     
     for i, key in enumerate(keys):
         for name in categorical_feature_names:
@@ -72,6 +90,7 @@ if "class_names" in st.session_state and "feature_names" in st.session_state and
         st.session_state["class_names"],
         st.session_state["feature_names"],
         st.session_state["data"],
+        categorical_names=st.session_state["categorical_names"],
         categorical_features=st.session_state["categorical_features"])
     
     idx = st.selectbox("Data index", options=[i for i in range(r)])
