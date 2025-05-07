@@ -2,8 +2,31 @@
 
 ## Overview
 
-This is a streamlit app interface to the [anchor](https://github.com/marcotcr/anchor)(anchors-exp) Python library, or more broadly, [the anchors explainable AI (XAI) method](https://christophm.github.io/interpretable-ml-book/anchors.html). This app is only designed to handle tabular data and classification models. 
+A lightweight, interactive Streamlit application for generating Anchors explanations for tabular models using the anchors-env library. Designed for interpretability of black-box classifiers through high-precision, human-readable rules. 
 
-Anchors, or Scoped Rules
+More information about anchors here:  
+- https://christophm.github.io/interpretable-ml-book/anchors.html
+- https://homes.cs.washington.edu/~marcotcr/aaai18.pdf 
 
-## 
+
+
+## Requirements/Features
+
+Python package requirements are found in the requirements.txt file. There is a quickstart script, `run.sh` which will work on linux systems, otherwise manual installation and setup is required.
+
+This application has two input requirements, a **csv file** and a **binary model file**. Here are the specifications for each:
+
+### CSV File
+- Headers are required
+- Data is numeric, and is processed in the way the model has been trained
+- The data itself can be train data, test data, or both
+- The data will be loaded to the application using `pandas`
+- The data needs *at minimum* all of the independent and dependent variables used in training
+
+### Binary Model File
+- Supervised Classification Model
+- This application has only been tested with `scikit-learn` classification models, but it *may* work with similar libraries 
+- The model *is not* saved with the built-in serialization methods, but rather with the [dill](https://pypi.org/project/dill/) python library
+
+
+This application is built solely for classification models on tabular datasets. 
