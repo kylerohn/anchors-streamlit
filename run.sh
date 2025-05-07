@@ -4,6 +4,10 @@ if [ ! -f ./pyvenv.cfg ]; then
 fi
 
 source ./bin/activate
+if [$? -neq 0]; then
+    echo "Virtual environment could not be activated."
+    exit
+fi
 
 expected=$(cat requirements.txt)
 actual=$(pip freeze)

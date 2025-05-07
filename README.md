@@ -18,15 +18,21 @@ This application has two input requirements, a **csv file** and a **binary model
 
 ### CSV File
 - Headers are required
-- Data is numeric, and is processed in the way the model has been trained
-- The data itself can be train data, test data, or both
-- The data will be loaded to the application using `pandas`
-- The data needs *at minimum* all of the independent and dependent variables used in training
+- Numeric data formatted consistently with how the model was trained
+- Can be train data, test data, or a combined set
+- Loaded via `pandas`
+- Must include *at minimum* all of the independent and dependent variables used during model training
 
 ### Binary Model File
 - Supervised Classification Model
 - This application has only been tested with `scikit-learn` classification models, but it *may* work with similar libraries 
-- The model *is not* saved with the built-in serialization methods, but rather with the [dill](https://pypi.org/project/dill/) python library
+- The model *is not* saved with the built-in serialization methods, but rather with the [dill](https://pypi.org/project/dill/) python library. Instructions can be found [here](#saving-your-model)
 
+Once you have these items prepared, you are able to utilize this application to streamline the process of finding anchors for your model.
 
 This application is built solely for classification models on tabular datasets. 
+
+
+### Saving Your Model
+
+Assuming you have a trained 
