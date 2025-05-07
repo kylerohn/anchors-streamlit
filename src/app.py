@@ -21,7 +21,9 @@ if datafile:
     if target:
         class_values = np.unique(data[target])
         class_values_str = "\n".join([str(i) for i in class_values])
-        class_names = st.text_area("Enter desired class value names on each line", value = class_values_str)
+        res = st.text_area("Enter desired class value names on each line", value = class_values_str)
+        
+        class_names = res.split("\n")
         
         if len(class_values) != len(class_names):
             st.write("Incorrect number of class names")

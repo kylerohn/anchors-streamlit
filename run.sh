@@ -23,9 +23,14 @@ if [ -f $anchor_tabular_file ]; then
     if ! grep -q "categorical_features = \[\]," $anchor_tabular_file; then
         sed -i 's/categorical_names={},/categorical_names={}, categorical_features = [],/' $anchor_tabular_file
     fi
+
+    if grep -q "self.categorical_features = \[\]" $anchor_tabular_file; then
+        sed -i 's/self\.categorical_features = []/self\.categorical_features = categorical_features/' $anchor_tabular_file
+    fi
 else
     echo "Missing File: $anchor_tabular_file"
     exit 1
 fi
+
 
 streamlit run src/app.py
