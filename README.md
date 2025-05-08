@@ -137,13 +137,6 @@ Now you can start explaining your model.
 
 ## Usage
 
-### CSV Settings
-
-1. Upload CSV dataset with formatted data
-2. Select the Target Feature, or the Dependent Variable
-   - Optionally, manually set labels for each possible target value
-3.  
-
 ### Saving Your Model
 
 To save a model, it is required to use the [dill](https://pypi.org/project/dill/) library:
@@ -156,3 +149,23 @@ dill.settings['recurse'] = True
 with open('path/model.modelfile', 'rb') as file:
     dill.dump(model, file)
 ```
+
+### Data Settings
+
+1. Upload CSV dataset with formatted data
+2. Select the target feature, or the dependent variable
+   - Optionally, manually set labels for each possible target value
+3. Select the input features, or the independent variables used in training. By default, all of them are selected
+4. Select the input features that are categorical variables 
+   - Optionally, manually set labels for possible values in each categorical variable. By default, the enumeration values are the labels
+
+
+
+### Model Upload
+
+Upload the model saved with `dill`. A dropdown menu will appear with an index for every row in the dataset, the default being index 0. Once you select the index you want to analyze, four items will appear:
+
+- Predicted value
+- Anchors for that prediction
+- Precision
+- Coverage
