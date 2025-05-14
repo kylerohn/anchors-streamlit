@@ -7,3 +7,4 @@ lib64/
 share/
 pyvenv.cfg
 temp/temp_model.modelfile
+training/
