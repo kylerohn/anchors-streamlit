@@ -4,7 +4,7 @@ if [ ! -f ./pyvenv.cfg ]; then
 fi
 
 source ./bin/activate
-if [$? -neq 0]; then
+if [ $? -neq 0 ]; then
     echo "Virtual environment could not be activated."
     exit
 fi

@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 import dill
+import threading
 from anchor import anchor_tabular as atx
         
 
@@ -19,6 +20,7 @@ if datafile:
                 options=keys)
     
     if target:
+        st.session_state["y_true"] = data[target]
         class_values = np.unique(data[target])
         class_values_str = "\n".join([str(i) for i in class_values])
         res = st.text_area("Enter desired class value names on each line", value = class_values_str)
@@ -95,12 +97,21 @@ if "class_names" in st.session_state and "feature_names" in st.session_state and
         categorical_names=st.session_state["categorical_names"],
         categorical_features=st.session_state["categorical_features"])
     
-    idx = st.selectbox("Data index", options=[i for i in range(r)])
+    import warnings
+    warnings.filterwarnings("ignore")
     
-    X_test = st.session_state["data"][idx].reshape(1, -1)
+    X_test = st.session_state["data"]
+    y_pred = st.session_state["model"].predict(X_test)
     
-    st.write('Prediction: ', explainer.class_names[model.predict(X_test)[0]])
-    exp = explainer.explain_instance(X_test, model.predict, threshold=0.95)
+    sample_options = np.array([f"{i} - Prediction: {st.session_state["class_names"][y_pred[i]]}" for i in range(st.session_state["data"].shape[0])])
+    option_idx = st.selectbox("Predicted Samples", options=sample_options)
+    idx = np.where(sample_options == option_idx)[0]
+    
+    X_row = st.session_state["data"][idx].reshape(1, -1)
+    
+    
+    # st.write('Prediction: ', explainer.class_names[model.predict(X_row)[0]])
+    exp = explainer.explain_instance(X_row, model.predict, threshold=0.95)
     st.markdown("---")
     st.write("Anchor: ")
     for name in exp.names():
@@ -109,5 +120,47 @@ if "class_names" in st.session_state and "feature_names" in st.session_state and
     st.write(f"Precision: {exp.precision():.2f}")
     st.write(f"Coverage: {exp.coverage():.2f}")
 
+    st.markdown("---")
+    
+    def find_all_anchors():
+        anchors = {
+            "y_true": [],
+            "y_pred": [],
+            "precision": [],
+            "coverage": []
+        }
+        
+        # st.session_state["progress"] = st.progress(value = len(anchors["y_pred"]) / len(y_pred), text = "Finding Anchors...")
+        # st.session_state["count"] = st.empty()
 
-
+        
+        for X_t, y_t, y_p in zip(X_test, st.session_state["y_true"], y_pred):
+            
+            
+            exp = explainer.explain_instance(X_t, model.predict, threshold=0.95)
+            anchors["y_true"].append(y_t)
+            anchors["y_pred"].append(y_p)
+            anchors["precision"].append(exp.precision())
+            anchors["coverage"].append(exp.coverage())
+            names = exp.names()
+            
+            iters = (len(anchors) - 4) if (len(anchors) - 4) > len(names) else len(names)
+            for count in range(iters):
+                if f"a{count}" not in anchors:
+                    anchors[f"a{count}"] = [None for i in range(len(anchors["y_pred"])-1)]
+                if len(names) > 0:
+                    anchors[f"a{count}"].append(names[0])
+                    names.pop(0)
+                else:
+                    anchors[f"a{count}"].append(None)
+                # print(len(anchors[f"a{count}"]))
+            
+            print(f"{len(anchors['y_pred'])} / {len(y_pred)}")
+        st.session_state["final_anchors"] = pd.DataFrame(anchors)
+    
+      
+    
+    st.button("Anchor Everything", on_click = find_all_anchors)
+    placeholder = st.empty()  
+    if "final_anchors" in st.session_state:
+        placeholder.dataframe(st.session_state["final_anchors"])
